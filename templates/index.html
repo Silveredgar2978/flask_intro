@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Flask Intro</title>
+    </head>
+    <body>
+        <h1>Talk to Flask</h1>
+
+        <input id="message-input" type="text" placeholder="Type something">
+        <!-- input wher euser types their message -->
+
+        <button id="send-button">Send</button>
+        <!-- button for sending -->
+        
+        <p id="result"></p>
+        <!-- empty because here goes result -->
+
+        <script>
+            // this time the JS is written directly inside the HTML file
+            // using a <script> tag is basically a mini JS file inside
+            //  Both approaches work, we do this because its a small script
+            const button = document.getElementById("send-button");
+            const input = document.getElementById("message-input");
+            const result = document.getElementById("result")
+
+            button.addEventListener("click", async function() {
+                // async means this function can wait for things to finish
+                // We need this because sending data to Flask and waiting for a response
+                // async lets JS wait without freezing the page
+
+                const message = input.value;
+                //read what user typed
+                
+                if (message === "") {
+                    result.textContent = "Please type something first.";
+                    return;
+                }
+
+                const response = await fetch("/ask", {
+                    // 'fetch is JS's built-in function for sending HTTP requests
+                    // '/ask' is the Flask route we are sending to
+                    // 'await' means: wait here until Flask espons before continuing
+
+                    method: "POST",
+                    // we are sending data so we use POST, matching our Flask route
+
+                    headers: { "Content-Type": "application/json" },
+                    // Tells Flask: "the data im sending is in json format"
+
+                    body: JSON.stringify({ message: message })
+                    // JSON.stringify() converts the JS object into a JSON string
+                    // { message: message } is the data we're sending to Flask
+                    // Flask reads this with request.get_json()
+                });
+
+                const data = await response.json();
+                //response.json() reads the json that Flask sent back
+                // 'await' againg because we're waiting 
+
+                result.textContent = data.response;
+                // data.response read the "response" key from Flask's jsonigy() return
+                // this displays Flask's answer on the page
+
+            });
+        </script>
+
+    </body>
+</html>
