@@ -3,18 +3,30 @@
 <html>
     <head>
         <title>Flask Intro</title>
+
+        <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+        <!-- connecting to css  i did all this to connect to flask, the css has to be in another folder named static/ -->
+         
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <!-- importing library called marked.js to format markdown answers -->
     </head>
     <body>
-        <h1>Talk to Flask</h1>
+        <h1>Talk to Silver</h1>
 
-        <input id="message-input" type="text" placeholder="Type something">
-        <!-- input wher euser types their message -->
-
-        <button id="send-button">Send</button>
-        <!-- button for sending -->
-        
         <p id="result"></p>
         <!-- empty because here goes result -->
+
+        <div class="input-row">
+        <!-- creating a class to modify these two in the css -->
+
+        <input id="message-input" type="text" placeholder="Ask a question">
+        <!-- input wher euser types their message -->
+
+        <button id="send-button" class="button-86" role="button">Send</button>
+        <!-- button for sending -->
+            
+        </div>
+
 
         <script>
             // this time the JS is written directly inside the HTML file
@@ -29,6 +41,10 @@
                 // We need this because sending data to Flask and waiting for a response
                 // async lets JS wait without freezing the page
 
+                button.disabled = true;
+                result.innerHTML = "Getting answer from Gemini"
+                // for disabling button in between the message
+                
                 const message = input.value;
                 //read what user typed
                 
@@ -58,10 +74,25 @@
                 //response.json() reads the json that Flask sent back
                 // 'await' againg because we're waiting 
 
-                result.textContent = data.response;
+                // result.textContent = data.response;
                 // data.response read the "response" key from Flask's jsonigy() return
                 // this displays Flask's answer on the page
 
+                result.innerHTML = marked.parse(data.response);
+                //update, innerHTML render actual HTML, and marked.parse() converts markdown (of gemini's answer) into HTML <tags> for the formatting
+
+                input.value = "";
+                button.disabled = flase;
+            });
+
+            // for pressing enter keydown (everytime a key is pressed)
+            // function(event) is the function that is going to run everytime a key is pressed
+            // event.key is recognizing the enter key
+            // button.click() programmatically clicks the send button
+            input.addEventListener("keydown", function(event){
+                if (event.key === "Enter") {
+                    button.click();
+                }
             });
         </script>
 
