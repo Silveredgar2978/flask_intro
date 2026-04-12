@@ -3,6 +3,13 @@ from flask import Flask, render_template, request, jsonify
 #'render_template' is a function that loads an HTML file from the templates/ folder
 #'request' lets Flask reaad data sent from a browser
 #'jsonify' converts a python dict into a JSON responsse
+from google import genai
+import os 
+from dotenv import load_dotenv
+
+load_dotenv()
+API_KEY = os.getenv("GEMINI_API_KEY")
+client = genai.Client(api_key=API_KEY)
 
 #to create the app
 
@@ -42,8 +49,15 @@ def ask():
     if message == "":
         response_text = "You sent an empty message"
     else:
-        response_text = f"Flask recieved your message: {message}"
-        #we will just send the message back as confirmation
+        try:        #gemini API call
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=message
+            )
+            response_text = response.text
+        except Exception as e:
+            response_text = f"There has been an error: {e} "
+            
 
     return jsonify({"response": response_text}) 
     #jsonify converts python dict to JSON response
